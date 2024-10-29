@@ -1,0 +1,235 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root{
+    --mainBgColor: #fff;
+    --mainTextColor: #333;
+    --primaryColor: rgb(101, 126, 228);
+    --primaryHoverColor: rgba(101, 126, 228, 0.29);
+}
+
+[data-theme="dark"]{
+    --mainBgColor: #333;
+    --mainTextColor: #fff;
+}
+
+body{
+    color: var(--mainTextColor);
+    background: var(--mainBgColor);
+    font-family: sans-serif;
+    transition: .2s ease-in-out;
+}
+
+.container{
+    width: 80%;
+    max-width: 1300px;
+    margin: auto;
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}
+
+button, input{
+    outline: none;
+}
+
+button{
+    cursor: pointer;
+}
+
+/* ---------------- header ---------------- */
+
+header{
+    background: var(--primaryColor);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 75px;
+}
+
+header .logo-container{
+    display: flex;
+    align-items: center;
+    gap: 3px
+}
+
+header .logo-container img{
+    height: 65;
+    width: 65px;
+    object-fit: cover;
+}
+
+
+/* ---------------- header right ---------------- */
+
+header .header-right{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: 35px;
+}
+
+header .header-right .header-right-btn-style{
+    border: 1px solid rgba(255, 255, 255, 0.599);
+    padding: 5px;
+    border-radius: 3px;
+    color: white;
+}
+
+header .header-right .sign-in{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    transition: .2s ease-in-out
+}
+
+header .header-right .change-theme{
+    height: 100%;
+    aspect-ratio: 1/1;
+    background: none;
+    transition: .2s ease-in-out
+}
+
+header .header-right .change-theme img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+header .header-right .sign-in:hover, header .header-right .change-theme:hover{
+    background: #ffffff55;
+}
+
+/* ---------------- left menu bar ---------------- */
+.left-menu-and-main-content{
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.left-menu-bar{
+    width: 300px;
+    height: calc(100vh - 75px);
+    background: rgba(179, 179, 179, 0.267);
+    position: relative;
+    transition: .2s ease-in-out;
+    padding: 15px;
+}
+
+.left-menu-bar.minimize{
+    width: 100px;
+    overflow: hidden;
+}
+
+.left-menu-bar .upload-btn, .left-menu-bar .user-btn{
+    width: 100%;
+    height: 40px;
+    font-size: 17px;
+    border: none;
+    border-radius: 5px;
+    transition: 100ms ease-in-out;
+}
+
+.left-menu-bar .upload-btn{
+    color: white;
+    transform-origin: top;
+    background: var(--primaryColor);
+}
+
+.left-menu-bar.minimize .upload-btn{
+    height: 0;
+    transform: scaleY(0);
+}
+
+.left-menu-bar .user-btn{
+    transform: translateY(0);
+    margin-top: 10px;
+    background: none;
+    border: 1px solid var(--primaryColor);
+    color: var(--primaryColor);
+    position: relative;
+}
+
+.left-menu-bar .user-btn:hover{
+    background: var(--primaryHoverColor);
+}
+
+.left-menu-bar .user-btn .arrow-icon{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 150ms ease-in-out;
+}
+
+.left-menu-bar.minimize .upload-btn{
+    opacity: 1;
+}
+
+.left-menu-bar .user-btn .arrow-icon img{
+    width: 27px;
+}
+
+.left-menu-bar.minimize .user-btn{
+    transform: translateY(-20px);
+    margin-top: 0px;
+}
+
+.left-menu-bar .user-btn span{
+    transition: inherit;
+}
+
+.left-menu-bar .user-btn.hide span:not(.arrow-icon){
+    opacity: 0;
+}
+
+.left-menu-bar .user-btn.hide .arrow-icon{
+    opacity: 1;
+}
+
+.left-menu-bar .handle-left-menu{
+    position: absolute;
+    bottom: 50px;
+    left: 15px;
+    height: 40px;
+    padding: 0 16px;
+    background: none;
+    border: 1px solid var(--primaryColor);
+    border-radius: 5px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms ease-in-out;
+}
+
+.left-menu-bar .handle-left-menu:hover{
+    background: var(--primaryHoverColor);
+}
+
+.left-menu-bar .handle-left-menu img{
+    transition: .2s ease-in-out;
+    transform: rotate(180deg);
+}
+
+.left-menu-bar.minimize .handle-left-menu img{
+    transform: rotate(0deg);
+}
+
+.left-menu-and-main-content .main-content{
+    padding: 15px;
+}
