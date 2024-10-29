@@ -7,6 +7,8 @@
 :root{
     --mainBgColor: #fff;
     --mainTextColor: #333;
+    --boxBg: rgb(232, 232, 232);
+    --innerBoxBg: rgb(202, 202, 202);
     --primaryColor: rgb(101, 126, 228);
     --primaryHoverColor: rgba(101, 126, 228, 0.29);
 }
@@ -14,6 +16,8 @@
 [data-theme="dark"]{
     --mainBgColor: #333;
     --mainTextColor: #fff;
+    --boxBg: rgb(60, 60, 60);
+    --innerBoxBg: rgb(74, 74, 74);
 }
 
 body{
@@ -119,7 +123,7 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
 .left-menu-bar{
     width: 300px;
     height: calc(100vh - 75px);
-    background: rgba(179, 179, 179, 0.267);
+    background: var(--boxBg);
     position: relative;
     transition: .2s ease-in-out;
     padding: 15px;
@@ -252,7 +256,7 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
 
 .main-content-area .select-upload-box .upload-box-inner, .main-content-area .welcome-box{
     height: 400px;
-    background: rgb(65, 65, 65);
+    background: var(--boxBg);
     margin-bottom: 20px;
     padding: 20px;
     margin-top: 10px;
@@ -263,7 +267,7 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
 }
 
 .main-content-area .upload-box-inner .drag-and-drop-area{
-    background: rgb(79, 79, 79);
+    background: var(--innerBoxBg);
     width: 100%;
     height: 200px;
     position: relative;
