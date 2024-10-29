@@ -77,7 +77,7 @@ header .header-right{
 }
 
 header .header-right .header-right-btn-style{
-    border: 1px solid rgba(255, 255, 255, 0.599);
+    border: 1px solid rgba(255, 255, 255, 0.27);
     padding: 5px;
     border-radius: 3px;
     color: white;
@@ -230,6 +230,99 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
     transform: rotate(0deg);
 }
 
-.left-menu-and-main-content .main-content{
-    padding: 15px;
+/* ---------------- main content area ---------------- */
+
+.left-menu-and-main-content .main-content-area{
+    height: calc(100vh - 75px);
+    overflow: hidden;
+}
+
+.main-content-area .scroll{
+    height: 100%;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.main-content-area .upload-area-title{
+    font-size: 25px;
+    font-weight: 300;
+    letter-spacing: .3px;
+}
+
+.main-content-area .select-upload-box .upload-box-inner, .main-content-area .welcome-box{
+    height: 400px;
+    background: rgb(65, 65, 65);
+    margin-bottom: 20px;
+    padding: 20px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    border-radius: 5px;
+}
+
+.main-content-area .upload-box-inner .drag-and-drop-area{
+    background: rgb(79, 79, 79);
+    width: 100%;
+    height: 200px;
+    position: relative;
+    border-radius: inherit;
+}
+
+.main-content-area .drag-and-drop-area .content{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.main-content-area .drag-and-drop-area .content button{
+    width: 150px;
+    height: 40px;
+    background: var(--primaryColor);
+    border: none;
+    font-size: 17px;
+    color: white;
+    border-radius: 5px;
+    font-weight: 300;
+    letter-spacing: .2px;
+}
+
+.main-content-area .welcome-box{
+    display: block;
+}
+
+.main-content-area .welcome-box p{
+    font-weight: 300;
+}
+
+.main-content-area .welcome-box p:not(:last-child){
+    margin-bottom: 10px;
+}
+
+.main-content-area .welcome-box p.bigger{
+    font-size: 25px;
+}
+
+.main-content-area .welcome-box button{
+    height: 40px;
+    padding: 0 30px;
+    font-size: 17px;
+    font-weight: 300;
+    background: none;
+    border: 1px solid var(--primaryHoverColor);
+    color: var(--primaryColor);
+    border-radius: 5px;
+    transition: 150ms ease-in-out;
+}
+
+.main-content-area .welcome-box button:hover{
+    background: var(--primaryHoverColor);
 }
