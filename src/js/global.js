@@ -3,6 +3,8 @@ const documentElm = document.documentElement;
 const changeTheme = document.querySelector('.change-theme');
 
 const leftMenu = document.querySelector('.left-menu-bar');
+const expandableUserMenu = leftMenu.querySelector('.expandable-user-menu');
+const innerMenu = expandableUserMenu.querySelector('.inner-menu');
 const handleLeftMenu = document.querySelector('.handle-left-menu');
 const userBtn = leftMenu.querySelector('.user-btn');
 const themeIcon = changeTheme.querySelector('img');
@@ -31,6 +33,14 @@ changeTheme.addEventListener('click', () => {
     storeInLocal('theme', documentElm.dataset.theme)
 });
 
+userBtn.addEventListener('click', () => {
+    leftMenu.classList.toggle('expand-user-menu');
+    const innerMenuBoundingRect = innerMenu.getBoundingClientRect();
+
+    if(leftMenu.classList.contains('expand-user-menu')){
+        expandableUserMenu.style.height = innerMenuBoundingRect.height + 'px';
+    }else expandableUserMenu.style = '';
+});
 
 handleLeftMenu.addEventListener('click', () => {
     userBtn.classList.toggle('hide');

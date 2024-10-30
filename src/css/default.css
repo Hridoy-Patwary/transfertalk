@@ -121,17 +121,20 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
 }
 
 .left-menu-bar{
-    width: 300px;
+    width: 280px;
     height: calc(100vh - 75px);
     background: var(--boxBg);
     position: relative;
     transition: .2s ease-in-out;
-    padding: 15px;
 }
 
 .left-menu-bar.minimize{
     width: 100px;
     overflow: hidden;
+}
+
+.left-menu-bar .menu-bar-top-buttons{
+    padding: 20px;
 }
 
 .left-menu-bar .upload-btn, .left-menu-bar .user-btn{
@@ -158,7 +161,7 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
     transform: translateY(0);
     margin-top: 10px;
     background: none;
-    border: 1px solid var(--primaryColor);
+    border: 1px solid var(--primaryHoverColor);
     color: var(--primaryColor);
     position: relative;
 }
@@ -169,15 +172,18 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
 
 .left-menu-bar .user-btn .arrow-icon{
     position: absolute;
-    left: 50%;
+    right: 20px;
     top: 50%;
-    transform: translate(-50%, -50%) rotate(90deg);
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
     pointer-events: none;
     transition: 150ms ease-in-out;
+}
+
+.left-menu-bar.expand-user-menu .user-btn .arrow-icon{
+    transform: translateY(-50%) rotate(90deg);
 }
 
 .left-menu-bar.minimize .upload-btn{
@@ -185,7 +191,15 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
 }
 
 .left-menu-bar .user-btn .arrow-icon img{
-    width: 27px;
+    width: 18px;
+}
+
+.left-menu-bar.minimize .arrow-icon{
+    right: 15px;
+}
+
+.left-menu-bar.minimize .arrow-icon img{
+    width: 25px;
 }
 
 .left-menu-bar.minimize .user-btn{
@@ -205,14 +219,63 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
     opacity: 1;
 }
 
+/* ---------------- left menu bar main ---------------- */
+
+.left-menu-bar .menu-bar-main .expandable-user-menu{
+    border-bottom: 1px solid #7f7f7f81;
+    height: 0px;
+    overflow: hidden;
+    transition: 200ms ease-in-out;
+}
+
+.left-menu-bar .menu-bar-main ul{
+    list-style: none;
+}
+
+.left-menu-bar .menu-bar-main ul li{
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    gap: 7px;
+    transition: 200ms ease-in-out;
+}
+
+.left-menu-bar .menu-bar-main ul li span{
+    transition: 100ms ease-in-out;
+}
+
+.left-menu-bar.minimize .menu-bar-main ul li span{
+    opacity: 0;
+}
+
+.left-menu-bar .menu-bar-main ul li img{
+    width: 20px;
+    vertical-align: middle;
+    transform: translateX(0);
+    transition: 150ms ease-in-out;
+}
+
+.left-menu-bar.minimize .menu-bar-main ul li img{
+    width: 25px;
+    transform: translateX(15px);
+}
+
+.left-menu-bar .menu-bar-main ul li:hover, .left-menu-bar .menu-bar-main ul li.active{
+    background: var(--innerBoxBg);
+}
+
+/* ---------------- end left menu bar main ---------------- */
+
 .left-menu-bar .handle-left-menu{
     position: absolute;
     bottom: 50px;
-    left: 15px;
+    left: 20px;
     height: 40px;
     padding: 0 16px;
     background: none;
-    border: 1px solid var(--primaryColor);
+    border: 1px solid var(--primaryHoverColor);
     border-radius: 5px;
     font-size: 16px;
     display: flex;
@@ -248,6 +311,24 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
     padding: 20px;
 }
 
+.main-content-area .scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content-area .scroll::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px var(--boxBg); 
+    border-radius: 10px;
+}
+
+.main-content-area .scroll::-webkit-scrollbar-thumb {
+    background: var(--innerBoxBg); 
+    border-radius: 10px;
+}
+
+.main-content-area .scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--primaryColor); 
+}
+
 .main-content-area .upload-area-title{
     font-size: 25px;
     font-weight: 300;
@@ -255,7 +336,7 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
 }
 
 .main-content-area .select-upload-box .upload-box-inner, .main-content-area .welcome-box{
-    height: 400px;
+    height: 350px;
     background: var(--boxBg);
     margin-bottom: 20px;
     padding: 20px;
@@ -272,6 +353,7 @@ header .header-right .sign-in:hover, header .header-right .change-theme:hover{
     height: 200px;
     position: relative;
     border-radius: inherit;
+    border: 2px dashed var(--mainBgColor);
 }
 
 .main-content-area .drag-and-drop-area .content{
