@@ -142,9 +142,13 @@ const updateUIonMenuClick = async () => {
 }
 
 const checkAndUpdateChangedUIeventListeners = () => {
+    const fileDragArea = document.querySelector('.drag-and-drop-area');
+    const fileUploadInp = document.getElementById('file-upload-inp');
     const createAccSignInPage = document.querySelector('.create-account-sign-in-pg');
     const faqList = document.querySelectorAll('.faq-page .faq-list .faq-box');
 
+    if(fileDragArea) handleDragAndDrop(fileDragArea, fileUploadInp);
+    
     if(createAccSignInPage) {
         createAccSignInPage.addEventListener('click', () => {
             leftMenu.querySelector(`[data-page='create-account']`).click();
@@ -152,6 +156,73 @@ const checkAndUpdateChangedUIeventListeners = () => {
     }
 
     if(faqList) handleFaqList(faqList);
+}
+
+const handleDragAndDrop = (dragArea, fileInp) => {
+    const dragAreaContent = dragArea.querySelector('.content');
+
+    dragArea.addEventListener('click', (e) => {
+        const target = e.target;
+        if(target.className !== 'validate-and-upload'){
+            fileInp.click()
+        }
+    })
+
+    dragArea.addEventListener('dragover', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        dragArea.classList.add('dragging-over');
+    });
+
+    dragArea.addEventListener('dragleave', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        dragArea.classList.remove('dragging-over');
+    });
+    
+    dragArea.addEventListener('drop', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const droppedFiles = e.dataTransfer.files;
+
+        if(droppedFiles.length > 0){
+            sendFilesToServer(droppedFiles, dragAreaContent);
+        }else console.log('No file chosen');
+        dragArea.classList.remove('dragging-over');
+    });
+
+    fileInp.addEventListener('change', () => {
+        const files = fileInp.files;
+        sendFilesToServer(files, dragAreaContent);
+    });
+}
+
+const sendFilesToServer = (fileList, contentArea) => {
+    const contentAreaTitle = contentArea.querySelector('p');
+    const addFilesBtn = contentArea.querySelector('button');
+    const addMoreOrSendContainer = document.createElement('div');
+    const filesOrFile = fileList.length == 1 ? 'file' : 'files';
+
+    addMoreOrSendContainer.innerHTML = `
+                                        <button class="add-more-files">Add more files</button>
+                                        <button class="validate-and-upload">Validate and upload</button>
+    `
+
+    addFilesBtn.remove();
+    addMoreOrSendContainer.className = 'add-more-or-send';
+    contentArea.append(addMoreOrSendContainer);
+    contentAreaTitle.innerHTML = fileList.length + ` selected ${filesOrFile} ready to send`;
+
+    // validate and upload to server
+    const validateAndUploadBtn = contentArea.querySelector('.validate-and-upload');
+    validateAndUploadBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        for (let i = 0; i < fileList.length; i++) {
+            const file = fileList[i];
+            console.log(file);
+        }
+    });
 }
 
 const handleFaqList = (faqElmList) => {
