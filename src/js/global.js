@@ -1,22 +1,37 @@
-const documentElm = document.documentElement;
+const htmlElm = document.documentElement;
+const pageLoader = htmlElm.querySelector('.page-loading');
 
 const changeTheme = document.querySelector('.change-theme');
 
 const leftMenu = document.querySelector('.left-menu-bar');
 const expandableUserMenu = leftMenu.querySelector('.expandable-user-menu');
+const menuList = leftMenu.querySelectorAll('.menu-container li');
 const innerMenu = expandableUserMenu.querySelector('.inner-menu');
 const handleLeftMenu = document.querySelector('.handle-left-menu');
 const userBtn = leftMenu.querySelector('.user-btn');
 const themeIcon = changeTheme.querySelector('img');
 
+const mainContentArea = document.querySelector('.main-content-area .scroll');
 const welcomeBox = document.querySelector('.welcome-box');
 const wlcmBoxInner = welcomeBox.querySelector('.box-inner');
 const reduceBtn = welcomeBox.querySelector('.reduce');
 
 const boxBoundingRect = wlcmBoxInner.getBoundingClientRect();
 
-
 // all functions and event listeners
+
+document.onreadystatechange = function(){
+    if(document.readyState == 'complete'){
+        pageLoader.classList.add('hide');
+    }
+};
+
+const getCurrentPage = () => {
+    const url = new URL(window.location.href);
+    const currentPage = url.searchParams.get('pg') ? url.searchParams.get('pg') : 'home';
+
+    return currentPage
+}
 
 changeTheme.addEventListener('click', () => {
     const currentIcon = themeIcon.dataset.currenticon;
@@ -24,13 +39,13 @@ changeTheme.addEventListener('click', () => {
     if (currentIcon == 'moon') {
         themeIcon.src = './assets/sun.svg';
         themeIcon.dataset.currenticon = 'sun';
-        documentElm.dataset.theme = 'dark';
+        htmlElm.dataset.theme = 'dark';
     } else {
         themeIcon.src = './assets/moon.svg';
         themeIcon.dataset.currenticon = 'moon';
-        documentElm.dataset.theme = 'light';
+        htmlElm.dataset.theme = 'light';
     }
-    storeInLocal('theme', documentElm.dataset.theme)
+    storeInLocal('theme', htmlElm.dataset.theme)
 });
 
 userBtn.addEventListener('click', () => {
@@ -59,13 +74,27 @@ reduceBtn.addEventListener('click', () => {
     }
 })
 
-
 const storeInLocal = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
 const getFromLocal = (key) => {
     return JSON.parse(localStorage.getItem(key));
+}
+
+const loadPageContent = async (pageName, pageSrc) => {
+    try {
+        const response = await fetch(`${pageSrc}.html`);
+
+        if (!response.ok) throw new Error("Page not found");
+
+        const content = await response.text();
+        window.history.pushState({ pageName }, '', `?pg=${pageName}`);
+        return content;
+    } catch (error) {
+        console.error("Error loading page:", error);
+        document.getElementById('content').innerHTML = "Page not found.";
+    }
 }
 
 window.addEventListener('load', () => {
@@ -78,7 +107,69 @@ window.addEventListener('load', () => {
             themeIcon.src = './assets/moon.svg';
             themeIcon.dataset.currenticon = 'light';
         }
-        documentElm.dataset.theme = theme
+        htmlElm.dataset.theme = theme
     }
     wlcmBoxInner.style.height = boxBoundingRect.height + 'px';
 });
+
+menuList.forEach((menu) => menu.addEventListener('click', () => {
+    const currentUrl = new URL(window.location.href);
+    const oldActiveMenu = leftMenu.querySelector('.menu-container li.active');
+    const urlStateTxt = menu.innerText.toLowerCase().replaceAll(' ', '-').trim();
+
+    currentUrl.searchParams.set('pg', urlStateTxt);
+    window.history.pushState({}, '', currentUrl);
+    oldActiveMenu.classList.remove('active');
+    menu.classList.add('active');
+    updateUIonMenuClick();
+}));
+
+const updateUIonMenuClick = async () => {
+    const page = getCurrentPage();
+    const oldActiveMenu = leftMenu.querySelector('li.active');
+    const currentPageMenu = leftMenu.querySelector(`[data-page=${page}]`);
+    const pageSrc = `./pages/${page}`;
+    let pageContent = '';
+
+    oldActiveMenu.classList.remove('active');
+    currentPageMenu.classList.add('active');
+    pageContent = await loadPageContent(page, pageSrc);
+
+    mainContentArea.innerHTML = '';
+    mainContentArea.innerHTML = pageContent;
+
+    checkAndUpdateChangedUIeventListeners();
+}
+
+const checkAndUpdateChangedUIeventListeners = () => {
+    const createAccSignInPage = document.querySelector('.create-account-sign-in-pg');
+    const faqList = document.querySelectorAll('.faq-page .faq-list .faq-box');
+
+    if(createAccSignInPage) {
+        createAccSignInPage.addEventListener('click', () => {
+            leftMenu.querySelector(`[data-page='create-account']`).click();
+        })
+    }
+
+    if(faqList) handleFaqList(faqList);
+}
+
+const handleFaqList = (faqElmList) => {
+    faqElmList.forEach((faq) => {
+        const faqBoxContent = faq.querySelector('p');
+        const faqBoxBoudingRect = faq.getBoundingClientRect();
+        const faqContentBoudingRect = faqBoxContent.getBoundingClientRect();
+
+        faq.addEventListener('click', () => {
+            const expandHeight = faqContentBoudingRect.height + faqBoxBoudingRect.height + 20;
+            faq.classList.toggle('expanded');
+            if(faq.classList.contains('expanded')){
+                faq.style.height = faqBoxBoudingRect.height + 'px';
+            }else{
+                faq.style.height = expandHeight + 1 + 'px';
+            }
+        });
+    })
+}
+
+updateUIonMenuClick();

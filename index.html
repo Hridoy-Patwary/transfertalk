@@ -19,6 +19,7 @@
             </button>
         </div>
     </header>
+    <div class="page-loading"></div>
     <div class="left-menu-and-main-content">
         <div class="left-menu-bar">
             <div class="menu-bar-top-buttons">
@@ -52,31 +53,27 @@
                     </ul>
                 </div>
                 <ul class="menu-container">
-                    <li class="active">
+                    <li class="active" data-page="home">
                         <img src="./assets/menu-icons/home.svg" alt="icon">
                         <span>Home</span>
                     </li>
-                    <li>
+                    <li data-page="upload-files">
                         <img src="./assets/menu-icons/upload.svg" alt="icon">
                         <span>Upload files</span>
                     </li>
-                    <li>
+                    <li data-page="sign-in">
                         <img src="./assets/menu-icons/signin.svg" alt="icon">
                         <span>Sign in</span>
                     </li>
-                    <li>
+                    <li data-page="create-account">
                         <img src="./assets/menu-icons/create-acc.svg" alt="icon">
                         <span>Create account</span>
                     </li>
-                    <li>
-                        <img src="./assets/menu-icons/api.svg" alt="icon">
-                        <span>API</span>
-                    </li>
-                    <li>
+                    <li data-page="faq">
                         <img src="./assets/menu-icons/faq.svg" alt="icon">
                         <span>FAQ</span>
                     </li>
-                    <li>
+                    <li data-page="contact">
                         <img src="./assets/menu-icons/contact.svg" alt="icon">
                         <span>Contact</span>
                     </li>
@@ -89,7 +86,7 @@
         <div class="main-content-area">
             <div class="scroll">
                 <div class="select-upload-box">
-                    <p class="upload-area-title">Select your files to upload</p>
+                    <p class="area-title">Select your files to upload</p>
                     <div class="upload-box-inner">
                         <div class="drag-and-drop-area">
                             <div class="content">
