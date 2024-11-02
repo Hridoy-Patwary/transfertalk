@@ -18,6 +18,8 @@ const reduceBtn = welcomeBox.querySelector('.reduce');
 
 const boxBoundingRect = wlcmBoxInner.getBoundingClientRect();
 
+const serverUrl = 'localhost:4050/api/v1/upload';
+
 // all functions and event listeners
 
 document.onreadystatechange = function(){
@@ -204,10 +206,8 @@ const sendFilesToServer = (fileList, contentArea) => {
     const addMoreOrSendContainer = document.createElement('div');
     const filesOrFile = fileList.length == 1 ? 'file' : 'files';
 
-    addMoreOrSendContainer.innerHTML = `
-                                        <button class="add-more-files">Add more files</button>
-                                        <button class="validate-and-upload">Validate and upload</button>
-    `
+    addMoreOrSendContainer.innerHTML = `<button class="add-more-files">Add more files</button>
+                                        <button class="validate-and-upload">Validate and upload</button>`;
 
     addFilesBtn.remove();
     addMoreOrSendContainer.className = 'add-more-or-send';
@@ -218,9 +218,20 @@ const sendFilesToServer = (fileList, contentArea) => {
     const validateAndUploadBtn = contentArea.querySelector('.validate-and-upload');
     validateAndUploadBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        const formData = new FormData();
+
         for (let i = 0; i < fileList.length; i++) {
             const file = fileList[i];
-            console.log(file);
+
+            formData.append('files', file);
+            fetch(serverUrl, {
+                method: 'post',
+                body: formData
+            }).then((res) => res.json()).then((data) => {
+                console.log(data)
+            }).catch((err) => {
+                console.log(err);
+            });
         }
     });
 }
