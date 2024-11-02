@@ -1,4 +1,6 @@
 const mysql = require('mysql2/promise');
+const dbConfig = require('../config/database');
+
 
 class Database{
     constructor(){
@@ -7,12 +9,7 @@ class Database{
 
     async connect() {
         try {
-            this.connection = await mysql.createConnection({
-                host: 'localhost',
-                user: 'root',
-                password: '',
-                database: 'transfertalk'
-            });
+            this.connection = await mysql.createConnection(dbConfig);
             console.log('Connected to mysql as id ' + this.connection.threadId);
         } catch (error) {
             console.error('DB connection failed: ', error);
