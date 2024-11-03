@@ -18,7 +18,7 @@ const reduceBtn = welcomeBox.querySelector('.reduce');
 
 const boxBoundingRect = wlcmBoxInner.getBoundingClientRect();
 
-const serverUrl = 'http://localhost:4050/api/v1/upload';
+const serverUrl = 'http://localhost:4050/';
 
 // all functions and event listeners
 
@@ -147,10 +147,30 @@ const checkAndUpdateChangedUIeventListeners = () => {
     const fileDragArea = document.querySelector('.drag-and-drop-area');
     const fileUploadInp = document.getElementById('file-upload-inp');
     const createAccSignInPage = document.querySelector('.create-account-sign-in-pg');
+    const signInSendMeMagicLink = document.querySelector('.send-magic-link');
     const faqList = document.querySelectorAll('.faq-page .faq-list .faq-box');
 
     if(fileDragArea) handleDragAndDrop(fileDragArea, fileUploadInp);
     
+    if(signInSendMeMagicLink){
+        signInSendMeMagicLink.addEventListener('click', () => {
+            const data = {
+                testing: true,
+                data: false
+            }
+            fetch(serverUrl+'api/v1/sign-in', ({
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })).then(res => res.json()).then((data) => {
+                console.log(data);
+            }).catch(err => {
+                console.log(err);
+            })
+        });
+    }
     if(createAccSignInPage) {
         createAccSignInPage.addEventListener('click', () => {
             leftMenu.querySelector(`[data-page='create-account']`).click();
@@ -225,7 +245,7 @@ const sendFilesToServer = (fileList, contentArea) => {
             formData.append('files', file);
         }
         
-        fetch(serverUrl, {
+        fetch(serverUrl+'api/v1/upload', {
             method: 'POST',
             body: formData
         }).then(res => {

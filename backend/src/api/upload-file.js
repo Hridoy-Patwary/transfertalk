@@ -21,18 +21,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post('/v1/upload', (req, res, next) => {
-    const uploadHandler = upload.array('files', 10);
-
+router.post('/v1/upload', upload.array('files'), (req, res) => {
     uploadHandler(req, res, (err) => {
         if(err instanceof multer.MulterError){
             return res.status(500).json({error: err.message});
         }else if(err){
             return res.status(500).json({error: 'Upload failed'});
         }
-
-        res.json({ message: 'Files uploaded successfully', files: req.files })
     });
+    res.json({ message: 'Files uploaded successfully' })
 })
 
 module.exports = router
