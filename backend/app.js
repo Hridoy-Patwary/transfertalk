@@ -21,11 +21,13 @@ app.use(bodyParser.json());
 // importing api routes
 const uploadFile = require('./src/api/upload-file');
 const signIn = require('./src/api/sign-in');
+const patreonToken = require('./src/api/patreon-token');
 
 
 // using api routes
 app.use('/api', uploadFile);
 app.use('/api', signIn);
+app.use('/api', patreonToken);
 
 
 

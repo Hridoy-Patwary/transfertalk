@@ -12,7 +12,7 @@ const userBtn = leftMenu.querySelector('.user-btn');
 const themeIcon = changeTheme.querySelector('img');
 
 const mainContentArea = document.querySelector('.main-content-area .scroll');
-
+const URI = new URL(window.location.href);
 
 const serverUrl = 'http://89.110.95.63:4050/';
 
@@ -30,6 +30,50 @@ const getCurrentPage = () => {
     const currentPage = url.searchParams.get('pg') ? url.searchParams.get('pg') : 'home';
 
     return currentPage
+}
+
+const getAccessToken = () => {
+    const clientId = "9-fYOy5ow-LtJB8U_UPCVdJ4l6gv2whs6KlQFJUyaoTBlxBlqI5cm5hpU7tw-vNA";
+    const clientSecret = "3rBy8maAg9G8FiidnZQ1ufeAeXW4A-d2iLmAxUieV3AOL7BpbIgZHaRofH-TmlHI";
+    const authorizationCode = URI.searchParams.get('code');
+    const redirectUri = "https://save4.online/";
+
+    fetch("https://www.patreon.com/api/oauth2/token", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            code: authorizationCode,
+            grant_type: "authorization_code",
+            redirect_uri: redirectUri
+        })
+    }).then(response => response.json())
+        .then(data => {
+            console.log("Access Token Response:", data);
+            localStorage.setItem('token', JSON.stringify(data));
+            // Handle the response, e.g., save the access token
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+
+const captureAuthCode = () => {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get('code');
+
+    fetch(serverUrl+'api/v1/token', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({code: code})
+    })
+    console.log(code); // send this code to server and make post request to get access token
+    return code;
 }
 
 changeTheme.addEventListener('click', () => {
@@ -118,8 +162,8 @@ menuList.forEach((menu) => menu.addEventListener('click', () => {
         currentUrl.searchParams.set('pg', urlStateTxt);
         window.history.pushState({ page }, '', `?pg=${urlStateTxt}`);
     }
-    
-    if(oldActiveMenu) oldActiveMenu.classList.remove('active');
+
+    if (oldActiveMenu) oldActiveMenu.classList.remove('active');
     menu.classList.add('active');
     updateUIonMenuClick();
 }));
@@ -131,8 +175,8 @@ const updateUIonMenuClick = async () => {
     const pageSrc = `./pages/${page}`;
     let pageContent = await loadPageContent(pageSrc);
 
-    if(oldActiveMenu) oldActiveMenu.classList.remove('active');
-    if(currentPageMenu) currentPageMenu.classList.add('active');
+    if (oldActiveMenu) oldActiveMenu.classList.remove('active');
+    if (currentPageMenu) currentPageMenu.classList.add('active');
     mainContentArea.innerHTML = '';
     mainContentArea.innerHTML = pageContent;
 
@@ -155,7 +199,7 @@ const checkAndUpdateChangedUIeventListeners = () => {
     if (signInWithPass) handleSignInWithPass(signInWithPass, signInSendMeMagicLink);
     if (signInSendMeMagicLink) { handleSendMagicLinkBtn(signInSendMeMagicLink) };
     if (loginWithPatreon) handleLoginWithPatreonBtn(loginWithPatreon);
-    if(welcomeBox) handleWelcomBox(welcomeBox);
+    if (welcomeBox) handleWelcomBox(welcomeBox);
 
     if (createAccSignInPage) {
         createAccSignInPage.addEventListener('click', () => {
@@ -300,6 +344,10 @@ window.addEventListener('load', () => {
             themeIcon.dataset.currenticon = 'light';
         }
         htmlElm.dataset.theme = theme
+    }
+    if(URI.searchParams.get('code')){
+        captureAuthCode();
+        // getAccessToken();
     }
 });
 

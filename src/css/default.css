@@ -904,15 +904,69 @@ circle {
     margin-bottom: 8px;
 }
 
+.create-account-ui span.or-text{
+    text-align: center;
+    margin: auto;
+    display: block;
+    margin-top: 15px;
+    color: var(--secondaryTextColor);
+}
+
 .create-account-ui .login-with-patreon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    height: 40px;
     background: none;
     color: var(--primaryColor);
     font-size: 17px;
     height: 40px;
-    padding: 0 20px;
+    padding: 0 40px;
     border-radius: 5px;
-    margin-top: 20px;
+    margin: auto;
+    margin-top: 15px;
     border: 1px solid var(--primaryHoverColor);
+    transition: 200ms ease-in-out;
+}
+
+.create-account-ui .login-with-patreon:hover{
+    background: var(--primaryHoverColor);
+}
+
+.create-account-ui .create-account-inp-box{
+    padding: 20px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 500px;
+    background: var(--boxBg);
+    align-items: center;
+    margin: 20px auto 0 auto;
+}
+
+.create-account-ui .create-account-inp-box input{
+    background: none;
+    width: 100%;
+    height: 40px;
+    padding-left: 10px;
+    font-size: 16px;
+    border: 1px solid var(--innerBoxBg);
+    border-radius: inherit;
+    color: var(--mainTextColor)
+}
+
+.create-account-ui .create-account-inp-box button{
+    height: 40px;
+    width: 100%;
+    border-radius: inherit;
+    background: var(--primaryColor);
+    border: none;
+    font-size: 16px;
+    color: white;
+    margin-top: 7px;
+    max-width: 250px;
 }
 
 .main-content-area .faq-page {
