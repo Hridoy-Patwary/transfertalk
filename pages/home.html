@@ -2,11 +2,70 @@
     <p class="area-title">Select your files to upload</p>
     <div class="upload-box-inner">
         <div class="drag-and-drop-area">
+            <span class="close-selected-files">
+                <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" height="20"><path fill="currentColor" d="M312.1 375c9.369 9.369 9.369 24.57 0 33.94s-24.57 9.369-33.94 0L160 289.9l-119 119c-9.369 9.369-24.57 9.369-33.94 0s-9.369-24.57 0-33.94L126.1 256L7.027 136.1c-9.369-9.369-9.369-24.57 0-33.94s24.57-9.369 33.94 0L160 222.1l119-119c9.369-9.369 24.57-9.369 33.94 0s9.369 24.57 0 33.94L193.9 256L312.1 375z"></path></svg>
+            </span>
             <input type="file" id="file-upload-inp" multiple>
             <div class="content">
                 <p>Drag and drop your files here or click to</p>
                 <button class="add-files">Add files</button>
             </div>
+        </div>
+    </div>
+</div>
+<div class="upload-in-progress-box">
+    <p class="area-title">Upload in progress...</p>
+    <div class="upload-progress-box-inner">
+        <div class="progress-circle">
+            <div class="progress-circle-outer">
+                <div class="progress-circle-inner">
+                <div id="progress-circle-number"></div>
+                </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <defs>
+                <linearGradient id="GradientColor">
+                    <stop offset="0%" stop-color="var(--primaryColor)" />
+                    <stop offset="100%" stop-color="var(--primaryColor)" />
+                </linearGradient>
+                </defs>
+                <!-- <circle cx="80" cy="80" r="70" stroke-linecap="round" /> -->
+                <circle cx="50" cy="50" r="40" stroke-linecap="round" />
+            </svg>
+        </div>
+        <div class="right-content">
+            <h2 class="sending-files">Sending 3 files in progress, 720 KB in total</h2>
+            <p class="uploaded-files">0/3 uploaded files</p>
+            <p class="upload-speed">Upload speed: <span>-- KB/s</span></p>
+            <p class="estimated-time">Estimated time remaining: <span>--</span></p>
+        </div>
+    </div>
+</div>
+<div class="all-done">
+    <p class="area-title">All done!</p>
+    <div class="all-files-uploaded-msg">
+        3 files uploaded, 720 kb in total
+    </div>
+    <div class="link-management-box">
+        <div class="link-and-share-box">
+            <div class="link-management">
+                <p>Here is your management link:</p>
+                <div class="link-copy-box">
+                    <p>https://uploadnow.io/files/HxwTVgH</p>
+                    <span>Copy</span>
+                </div>
+                <p>Here is your management link:</p>
+                <div class="link-copy-box">
+                    <p>https://uploadnow.io/files/HxwTVgH</p>
+                    <span>Copy</span>
+                </div>
+                <div class="social-list-items"></div>
+            </div>
+            <div class="show-qr-code"></div>
+        </div>
+        <div class="buttons">
+            <button class="new-folder">New folder</button>
+            <button class="new-upload">New upload</button>
         </div>
     </div>
 </div>

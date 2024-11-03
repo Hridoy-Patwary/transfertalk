@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File upload & sharing</title>
+    <link rel='shortcut icon' type='image/x-icon' href='./assets/favicon.jpeg' />
     <link rel="stylesheet" href="./src/css/default.css">
     <link rel="stylesheet" href="./src/css/home.css">
 </head>
@@ -89,6 +90,9 @@
                     <p class="area-title">Select your files to upload</p>
                     <div class="upload-box-inner">
                         <div class="drag-and-drop-area">
+                            <span class="close-selected-files">
+                                <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" height="20"><path fill="currentColor" d="M312.1 375c9.369 9.369 9.369 24.57 0 33.94s-24.57 9.369-33.94 0L160 289.9l-119 119c-9.369 9.369-24.57 9.369-33.94 0s-9.369-24.57 0-33.94L126.1 256L7.027 136.1c-9.369-9.369-9.369-24.57 0-33.94s24.57-9.369 33.94 0L160 222.1l119-119c9.369-9.369 24.57-9.369 33.94 0s9.369 24.57 0 33.94L193.9 256L312.1 375z"></path></svg>
+                            </span>
                             <input type="file" id="file-upload-inp" multiple>
                             <div class="content">
                                 <p>Drag and drop your files here or click to</p>
@@ -114,6 +118,7 @@
         </div>
     </div>
 
+    <script src="./src/js/functions.js"></script>
     <script src="./src/js/global.js"></script>
 </body>
 </html>
