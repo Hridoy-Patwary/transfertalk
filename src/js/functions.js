@@ -1,33 +1,15 @@
-const runAnimation = (circle, percentageDisplay) => {
+const runAnimation = (circle, uploadPercentage) => {
     const startOffset = 450; // Starting offset
     const endOffset = 205; // Ending offset
     const totalChange = startOffset - endOffset; // Total change in offset
 
-    let progress = 0;
-    const duration = 5000; // Duration in milliseconds
-    const startTime = performance.now();
+    const offset = startOffset - (uploadPercentage / 100) * totalChange;
+    circle.style.strokeDashoffset = offset;
 
-    function animate(time) {
-        // Calculate elapsed time
-        const elapsed = time - startTime;
-
-        // Calculate the current progress percentage (0 to 100)
-        const percentage = Math.min((elapsed / duration) * 100, 100);
-        progress = percentage;
-
-        // Update the stroke offset for the circular progress
-        const offset = startOffset - (percentage / 100) * totalChange;
-        circle.style.strokeDashoffset = offset
-        percentageDisplay.innerHTML = `${Math.floor(percentage)}%`;
-        // Continue the animation if progress is below 100%
-        if (percentage < 100) {
-            requestAnimationFrame(animate);
-        }else{
-            showAllDonePage();
-        }
+    if (uploadPercentage >= 100) {
+        showAllDonePage();
     }
-    requestAnimationFrame(animate);
-}
+};
 
 const showAllDonePage = async () => {
     const allDonePage = await loadPageContent(`./pages/all-done`);
@@ -35,6 +17,9 @@ const showAllDonePage = async () => {
     mainContentArea.innerHTML = '';
     mainContentArea.innerHTML = allDonePage;
 
+
+    const allDone = document.querySelector('.all-done');
+    const filesUploadedMsgBar = allDone.querySelector('.all-files-uploaded-msg');
     interactionInAllDonePage();
 }
 
@@ -44,13 +29,12 @@ const interactionInAllDonePage = () => {
 
     linkCopyBtns.forEach((btn) => btn.addEventListener('click', () => {
         navigator.clipboard.writeText(btn.previousElementSibling.innerText).catch((err) => {
-            if(err){
+            if (err) {
                 console.log(err);
             }
         })
     }))
 }
-
 
 
 const handleDragAndDrop = (dragArea, fileInp) => {
@@ -106,10 +90,7 @@ const sendFilesToServer = (fileList, contentArea) => {
     const progressSvg = uploadProgressContainer.querySelector('svg circle');
     const progressPercentage = document.getElementById('progress-circle-number');
 
-    const allDone = document.querySelector('.all-done');
-    const filesUploadedMsgBar = allDone.querySelector('.all-files-uploaded-msg');
-    
-    
+
     const contentAreaTitle = contentArea.querySelector('p');
     const dragDropArea = contentArea.closest('.drag-and-drop-area');
     const selectedFilesClose = dragDropArea.querySelector('.close-selected-files');
@@ -117,11 +98,11 @@ const sendFilesToServer = (fileList, contentArea) => {
     const addMoreOrSendContainer = document.createElement('div');
     const filesOrFile = fileList.length == 1 ? 'file' : 'files';
     const addFilesCopy = addFilesBtn.cloneNode(true);
-    
-    
+
+
     addMoreOrSendContainer.innerHTML = `<button class="add-more-files">Add more files</button>
     <button class="validate-and-upload" type="button">Validate and upload</button>`;
-    
+
     addFilesBtn.remove();
     boxTitle.innerHTML = 'Confirm to start the upload';
     addMoreOrSendContainer.className = 'add-more-or-send';
@@ -129,7 +110,7 @@ const sendFilesToServer = (fileList, contentArea) => {
     contentArea.append(addMoreOrSendContainer);
     dragDropArea.classList.add('active');
     contentAreaTitle.innerHTML = fileList.length + ` selected ${filesOrFile} ready to send`;
-    
+
     // validate and upload to server
     const validateAndUploadBtn = contentArea.querySelector('.validate-and-upload');
     validateAndUploadBtn.addEventListener('click', (e) => {
@@ -147,19 +128,31 @@ const sendFilesToServer = (fileList, contentArea) => {
             formData.append('files', file);
         }
 
-        // fetch(serverUrl + 'api/v1/upload', {
-        //     method: 'POST',
-        //     body: formData
-        // }).then(res => {
-        //     if (!res.ok) throw new Error('Network response was not ok');
-        //     return res.json();
-        // }).then((data) => {
-        //     console.log(data);
-        // }).catch((err) => {
-        //     console.log('Fetch error:', err);
-        // });
+        const xhr = new XMLHttpRequest();
 
-        runAnimation(progressSvg, progressPercentage)
+        xhr.open('POST', serverUrl + 'api/v1/upload', true);
+        xhr.upload.addEventListener('progress', function (e) {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                const percentageNum = Math.round(percentComplete);
+                progressPercentage.innerHTML = percentageNum + '%';
+                runAnimation(progressSvg, percentageNum);
+            }
+        });
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const data = JSON.parse(xhr.responseText);
+                console.log(data); // Log the response data
+            } else {
+                console.log('Upload failed:', xhr.statusText);
+            }
+        };
+
+        xhr.onerror = function () {
+            console.log('Request failed');
+        };
+        xhr.send(formData);
     });
 
     selectedFilesClose.addEventListener('click', () => {

@@ -14,7 +14,7 @@ const themeIcon = changeTheme.querySelector('img');
 const mainContentArea = document.querySelector('.main-content-area .scroll');
 
 
-const serverUrl = 'http://localhost:4050/';
+const serverUrl = 'http://89.110.95.63:4050/';
 
 
 // all functions and event listeners
