@@ -5,8 +5,9 @@ const changeTheme = document.querySelector('.change-theme');
 
 const signInBtnHeader = document.querySelector('header .sign-in.header-right-btn-style');
 const leftMenu = document.querySelector('.left-menu-bar');
+const uploadBtnLeftMenu = leftMenu.querySelector('.upload-btn');
 const expandableUserMenu = leftMenu.querySelector('.expandable-user-menu');
-const menuList = leftMenu.querySelectorAll('.menu-container li');
+const menuList = leftMenu.querySelectorAll('.menu-bar-main li');
 const handleLeftMenu = document.querySelector('.handle-left-menu');
 const userBtn = leftMenu.querySelector('.user-btn');
 const themeIcon = changeTheme.querySelector('img');
@@ -32,47 +33,18 @@ const getCurrentPage = () => {
     return currentPage
 }
 
-const getAccessToken = () => {
-    const clientId = "9-fYOy5ow-LtJB8U_UPCVdJ4l6gv2whs6KlQFJUyaoTBlxBlqI5cm5hpU7tw-vNA";
-    const clientSecret = "3rBy8maAg9G8FiidnZQ1ufeAeXW4A-d2iLmAxUieV3AOL7BpbIgZHaRofH-TmlHI";
-    const authorizationCode = URI.searchParams.get('code');
-    const redirectUri = "https://save4.online/";
-
-    fetch("https://www.patreon.com/api/oauth2/token", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            code: authorizationCode,
-            grant_type: "authorization_code",
-            redirect_uri: redirectUri
-        })
-    }).then(response => response.json())
-        .then(data => {
-            console.log("Access Token Response:", data);
-            localStorage.setItem('token', JSON.stringify(data));
-            // Handle the response, e.g., save the access token
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
-}
-
 const captureAuthCode = () => {
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
-
-    fetch(serverUrl+'api/v1/token', {
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({code: code})
-    })
     console.log(code); // send this code to server and make post request to get access token
+
+    // fetch(serverUrl+'api/v1/token', {
+    //     method: 'post',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify({code: code})
+    // })
     return code;
 }
 
@@ -151,9 +123,11 @@ const loadPageContent = async (pageSrc) => {
 }
 
 menuList.forEach((menu) => menu.addEventListener('click', () => {
+    if(!menu.dataset.page) return;
     const currentUrl = new URL(window.location.href);
-    const oldActiveMenu = leftMenu.querySelector('.menu-container li.active');
-    const urlStateTxt = menu.innerText.toLowerCase().replaceAll(' ', '-').trim();
+    const oldActiveMenu = leftMenu.querySelector('.menu-bar-main li.active');
+    // const urlStateTxt = menu.innerText.toLowerCase().replaceAll(' ', '-').trim();
+    const urlStateTxt = menu.dataset.page;
     const page = urlStateTxt;
 
     if (page === 'home') {
@@ -193,6 +167,8 @@ const checkAndUpdateChangedUIeventListeners = () => {
     const faqList = document.querySelectorAll('.faq-page .faq-list .faq-box');
     const welcomeBox = document.querySelector('.welcome-box');
 
+    const fileViewMain = document.querySelector('.file-view-ui');
+
 
     if (fileDragArea) handleDragAndDrop(fileDragArea, fileUploadInp);
 
@@ -208,6 +184,28 @@ const checkAndUpdateChangedUIeventListeners = () => {
     }
 
     if (faqList) handleFaqList(faqList);
+    if(fileViewMain) handleFileViewInteractions(fileViewMain);
+}
+
+const handleFileViewInteractions = (fileView) => {
+    const fileViewSearchClearInp = fileView.querySelector('.clear-search-inp');
+    const fileViewSearchInp = fileView.querySelector('.search-inp-container input');
+    const selectAllFiles = fileView.querySelector('#select-all-files');
+    const selectFileCheckboxes = fileView.querySelectorAll('.file-list-item .select input');
+
+    fileViewSearchInp.addEventListener('keyup', () => {
+        console.log(fileViewSearchInp.value);
+    });
+
+    selectAllFiles.addEventListener('click', () => {
+        selectFileCheckboxes.forEach((inp) => {
+            inp.checked = selectAllFiles.checked;
+        });
+    });
+
+    fileViewSearchClearInp.addEventListener('click', () => {
+        fileViewSearchInp.value = '';
+    });
 }
 
 const handleWelcomBox = (welcomeBox) => {
@@ -326,6 +324,8 @@ const handleFaqList = (faqElmList) => {
         });
     })
 }
+
+uploadBtnLeftMenu.addEventListener('click', () => leftMenu.querySelector(`[data-page='upload-files']`).click());
 
 
 updateUIonMenuClick();

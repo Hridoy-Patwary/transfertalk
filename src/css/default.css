@@ -13,6 +13,7 @@
     --innerBoxBg: rgb(202, 202, 202);
     --primaryColor: rgb(101, 126, 228);
     --primaryHoverColor: rgba(101, 126, 228, 0.29);
+    --imgInvertColor: invert(1) brightness(.2);
 }
 
 [data-theme="dark"] {
@@ -22,6 +23,7 @@
     --dimmedTextColor: #a9a9a9;
     --boxBg: rgb(60, 60, 60);
     --innerBoxBg: rgb(74, 74, 74);
+    --imgInvertColor: invert(1) brightness(.6);
 }
 
 body {
@@ -309,6 +311,7 @@ header .header-right .change-theme:hover {
     vertical-align: middle;
     transform: translateX(0);
     transition: 150ms ease-in-out;
+    filter: var(--imgInvertColor);
 }
 
 .left-menu-bar.minimize .menu-bar-main ul li img {
@@ -917,7 +920,6 @@ circle {
     align-items: center;
     justify-content: center;
     width: max-content;
-    height: 40px;
     background: none;
     color: var(--primaryColor);
     font-size: 17px;
@@ -1006,4 +1008,245 @@ circle {
     font-weight: 300;
     cursor: default;
     line-height: 20px;
+}
+
+/* ---------------- file view page ---------------- */
+.file-view-ui{
+    background: var(--boxBg);
+    padding: 20px;
+}
+
+.file-view-ui .file-view-header {
+    padding: 10px 0;
+}
+
+.file-view-ui .file-view-header span{
+    color: var(--secondaryTextColor)
+}
+
+.file-view-ui .file-view-header span:nth-child(2){
+    color: var(--dimmedTextColor)
+}
+
+.file-view-ui .file-view-header span img{
+    vertical-align: -3px;
+    margin-right: 2px;
+}
+
+.file-view-ui .file-view-sub-header{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.file-view-ui .file-view-sub-header .search-inp-container{
+    position: relative;
+    height: 40px;
+    border: 1px solid var(--innerBoxBg);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 400px;
+    max-width: 100%;
+}
+
+.file-view-ui .search-inp-container svg{
+    pointer-events: none;
+    height: 18px;
+    width: 18px;
+}
+
+.file-view-ui .search-inp-container svg path{
+    fill: var(--secondaryTextColor);
+}
+
+.file-view-ui .search-inp-container .search-svg{
+    width: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-view-ui .search-inp-container input{
+    background: none;
+    height: 100%;
+    border: none;
+    color: var(--mainTextColor);
+    font-size: 16px;
+}
+
+.file-view-ui .search-inp-container .clear-search-inp{
+    height: 100%;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--innerBoxBg);
+    cursor: pointer;
+}
+
+.file-view-ui .search-inp-container .clear-search-inp img{
+    filter: var(--imgInvertColor);
+}
+
+.file-view-ui .file-manager-view{
+    margin-top: 20px;
+}
+
+.file-view-ui .file-manager-view .file-view-header,
+.file-view-ui .file-manager-view .file-list-item{
+    background: var(--mainBgColor);
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+}
+
+.file-view-ui .file-manager-view .file-view-header .select,
+.file-view-ui .file-manager-view .file-list-item .select{
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-view-ui .file-manager-view .file-view-header .select input, 
+.file-view-ui .file-manager-view .file-list-item .select input{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #7b7b7b61;
+    background-color: var(--innerBoxBg);
+    cursor: pointer;
+    border-radius: 4px;
+    position: relative;
+}
+
+.file-view-ui .file-manager-view .file-view-header .select input:checked,
+.file-view-ui .file-manager-view .file-list-item .select input:checked {
+    background-color: var(--primaryColor);
+}
+
+.file-view-ui .file-manager-view .file-view-header .select input:checked::after,
+.file-view-ui .file-manager-view .file-list-item .select input:checked::after {
+    content: "✔";
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.file-view-ui .file-manager-view .file-view-header .sizes, 
+.file-view-ui .file-manager-view .file-list-item .sizes{
+    width: 70px;
+}
+
+.file-view-ui .file-manager-view .file-view-header .modified-on, 
+.file-view-ui .file-manager-view .file-list-item .modified-on{
+    width: 100px;
+}
+
+.file-view-ui .file-manager-view .file-view-header .file-options, 
+.file-view-ui .file-manager-view .file-list-item .file-options{
+    width: 150px;
+}
+
+.file-view-ui .file-manager-view .file-list-item {
+    background: var(--boxBg);
+    padding: 10px 0;
+    font-weight: 300;
+    align-items: center;
+}
+
+/* .file-view-ui .file-manager-view .file-list-item .select input{
+    width: 15px;
+    height: 15px;
+} */
+
+.file-view-ui .file-manager-view .file-list-item .sizes, 
+.file-view-ui .file-manager-view .file-list-item .modified-on{
+    font-size: 14px;
+}
+
+.file-view-ui .file-manager-view .file-list-item .file-options{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.file-view-ui .file-manager-view .file-list-item .file-options .file-view-icon,
+.file-view-ui .file-manager-view .file-list-item .file-options .download-icon{
+    width: 30px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 200ms ease-in-out
+}
+.file-view-ui .file-manager-view .file-list-item .file-options .file-view-icon:hover,
+.file-view-ui .file-manager-view .file-list-item .file-options .download-icon:hover{
+    background: var(--innerBoxBg);
+}
+
+.file-view-ui .file-manager-view .file-list-item .file-options img{
+    width: 15px;
+    height: 15px;
+    filter: var(--imgInvertColor);
+}
+
+/* ---------------- page ui ---------------- */
+.page-ui{
+    background: var(--boxBg);
+}
+
+.profile-heading{
+    display: flex;
+    gap: 5px;
+    padding: 20px;
+}
+
+.profile-heading .user-icon{
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--innerBoxBg);
+    border-radius: 50%;
+}
+
+.profile-heading .user-icon img{
+    width: 40px;
+    filter: var(--imgInvertColor);
+}
+
+.profile-heading .user-content h3{
+    font-size: 30px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.profile-heading .user-content p{
+    color: var(--secondaryTextColor);
+}
+
+.page-ui-extra .create-account-btns{
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.page-ui-extra .create-account-btns button{
+    margin: 0;
+}
+
+.page-ui-extra .create-account-btns button.login{
+    background: var(--primaryColor);
+    color: white;
 }

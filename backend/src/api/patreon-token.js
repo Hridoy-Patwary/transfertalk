@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../db/connect');
+
 
 router.post('/v1/token', async (req, res) => {
     const { code } = req.body;
@@ -24,10 +26,27 @@ router.post('/v1/token', async (req, res) => {
         });
         const data = await response.json();
 
-        if(data.accessToken){
-            const accessToken = data.accessToken; // use this to fetch membership about data
+        if(data.access_token){
+            const dataAsText = JSON.stringify(data);
+            const sql = `INSERT INTO tokens (data) VALUES ('${dataAsText}')`;
+            const createTableQuery = `CREATE TABLE IF NOT EXISTS tokens (
+                                            id INT AUTO_INCREMENT PRIMARY KEY,
+                                            uid INT,
+                                            data TEXT NOT NULL
+                                        )`;
+            
+            await db.connect();
+            const connection = db.getConnection();
+
+            try {
+                await connection.query(createTableQuery);
+                await connection.query(sql)
+                connection.end();
+            } catch (err) {
+                console.log(err)
+                connection.end();
+            }
         }
-        console.log(data);
         res.json(data);
     } catch (err) {
         console.log(err)
