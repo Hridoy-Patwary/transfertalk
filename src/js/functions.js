@@ -1,3 +1,21 @@
+const setCookie = (name, value, days) => {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+}
+
+const getCookie = (name) => {
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookies = decodedCookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.indexOf(name + '=') === 0) {
+            return cookie.substring(name.length + 1);
+        }
+    }
+    return null;
+}
+
 const runAnimation = (circle, uploadPercentage) => {
     const startOffset = 450; // Starting offset
     const endOffset = 205; // Ending offset
@@ -115,21 +133,31 @@ const sendFilesToServer = (fileList, contentArea) => {
     const validateAndUploadBtn = contentArea.querySelector('.validate-and-upload');
     validateAndUploadBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        const xhr = new XMLHttpRequest();
         const formData = new FormData();
 
         selectUploadBox.classList.add('hide');
         selectUploadBox.style.height = '200px'
         uploadProgressContainer.classList.add('active');
-        sendingFiles.innerHTML = `Sending ${fileList.length} ${filesOrFile} in progress, 729kb in total`;
-        uploadedFiles.innerHTML = `0/${fileList.length}`;
+
+        try {
+            sendingFiles.innerHTML = `Sending ${fileList.length} ${filesOrFile} in progress, 729kb in total`;
+            uploadedFiles.innerHTML = `0/${fileList.length}`;
+        } catch (err) {
+            console.log(err)
+        }
+
+        formData.append('uid', UID);
 
         for (let i = 0; i < fileList.length; i++) {
             const file = fileList[i];
             formData.append('files', file);
         }
 
-        const xhr = new XMLHttpRequest();
 
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
         xhr.open('POST', serverUrl + 'api/v1/upload', true);
         xhr.upload.addEventListener('progress', function (e) {
             if (e.lengthComputable) {
@@ -163,5 +191,93 @@ const sendFilesToServer = (fileList, contentArea) => {
         addMoreOrSendContainer.remove();
         contentArea.append(addFilesCopy);
         fileList = ''
+    })
+}
+
+const profileUiInteractions = (UI) => {
+    const profileViewUserName = UI.querySelector('.username');
+    const upgradeWithPatreon = document.querySelector('.page-ui-extra .upgrade-with-patreon');
+    const userData = getFromLocal('user-data');
+
+    if(userData.username){
+        profileViewUserName.innerHTML = userData.username;
+    }else{
+        profileViewUserName.innerHTML = 'anonym' + UID;
+    }
+
+    upgradeWithPatreon.addEventListener('click', () => {
+        alert("You'll need to Login with Patreon first to subscribe with Patreon")
+    });
+}
+
+
+const handleWelcomBox = (welcomeBox) => {
+    const wlcmBoxInner = welcomeBox.querySelector('.box-inner');
+    const reduceBtn = welcomeBox.querySelector('.reduce');
+    const boxBoundingRect = wlcmBoxInner.getBoundingClientRect();
+
+    wlcmBoxInner.style.height = boxBoundingRect.height + 'px';
+    reduceBtn.addEventListener('click', () => {
+        if (reduceBtn.classList.contains('show-more')) {
+            wlcmBoxInner.style.height = boxBoundingRect.height + 'px';
+            reduceBtn.innerHTML = 'Reduce';
+            reduceBtn.classList.remove('show-more');
+        } else {
+            wlcmBoxInner.style.height = (boxBoundingRect.height - 105) + 'px';
+            reduceBtn.innerHTML = 'Show more';
+            reduceBtn.classList.add('show-more');
+        }
+    })
+}
+
+const handleFaqList = (faqElmList) => {
+    faqElmList.forEach((faq) => {
+        const faqBoxContent = faq.querySelector('p');
+        const faqBoxBoudingRect = faq.getBoundingClientRect();
+        const faqContentBoudingRect = faqBoxContent.getBoundingClientRect();
+
+        faq.addEventListener('click', () => {
+            const expandHeight = faqContentBoudingRect.height + faqBoxBoudingRect.height + 20;
+            faq.classList.toggle('expanded');
+            if (faq.classList.contains('expanded')) {
+                faq.style.height = faqBoxBoudingRect.height + 'px';
+            } else {
+                faq.style.height = expandHeight + 1 + 'px';
+            }
+        });
+    })
+}
+
+const handleSendMagicLinkBtn = (btn) => {
+    const emailInp = btn.parentElement.querySelector('input.sign-in-email-inp');
+
+    btn.addEventListener('click', () => {
+        if (emailInp.value === '') {
+            emailInp.style.borderColor = 'rgb(207, 8, 8)';
+        } else {
+            const data = {
+                email: emailInp.value,
+                data: false
+            }
+            fetch(serverUrl + 'api/v1/sign-in', ({
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })).then(res => res.json()).then((data) => {
+                console.log(data);
+            }).catch(err => {
+                console.log(err);
+            });
+            emailInp.style = ''
+        }
+    });
+}
+
+
+const handleLoginWithPatreonBtn = (btn) => {
+    btn.addEventListener('click', () => {
+        console.log('login with patreon btn clicked');
     })
 }

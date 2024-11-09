@@ -15,7 +15,10 @@ const themeIcon = changeTheme.querySelector('img');
 const mainContentArea = document.querySelector('.main-content-area .scroll');
 const URI = new URL(window.location.href);
 
-const serverUrl = 'http://89.110.95.63:4050/';
+const serverUrl = 'http://localhost:4050/';
+// const serverUrl = 'http://89.110.95.63:4050/';
+
+let UID = getCookie('userId');
 
 
 // all functions and event listeners
@@ -46,6 +49,43 @@ const captureAuthCode = () => {
     //     body: JSON.stringify({code: code})
     // })
     return code;
+}
+
+const setupUser = () => {
+    const checkUUID = getCookie('userId');
+    const userData = {}
+
+    if(checkUUID){
+        fetch(serverUrl+'api/v1/get-user-data', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: checkUUID})
+        }).then(res => res.json()).then((data) => {
+            storeInLocal('user-data', data);
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        });
+        UID = checkUUID;
+    }else{
+        fetch(serverUrl+'api/v1/auto-user', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        }).then(res => res.json()).then((data) => {
+            setCookie('userId', data.id, 30);
+            UID = data.id;
+            storeInLocal('user-data', data);
+            console.log('user id set to cookie, user id is: '+ getCookie('userId'));
+        }).catch((err) => {
+            console.log(err);
+            throw err;
+        })
+    }
 }
 
 changeTheme.addEventListener('click', () => {
@@ -167,6 +207,9 @@ const checkAndUpdateChangedUIeventListeners = () => {
     const faqList = document.querySelectorAll('.faq-page .faq-list .faq-box');
     const welcomeBox = document.querySelector('.welcome-box');
 
+    
+
+    const profileUI = document.querySelector('.profile-ui');
     const fileViewMain = document.querySelector('.file-view-ui');
 
 
@@ -184,20 +227,88 @@ const checkAndUpdateChangedUIeventListeners = () => {
     }
 
     if (faqList) handleFaqList(faqList);
+
+    if(profileUI) profileUiInteractions(profileUI);
     if(fileViewMain) handleFileViewInteractions(fileViewMain);
 }
+
+const formatBytes = (bytes) => {
+    if (bytes < 1024) return `${bytes} B`; // Less than 1 KB
+    else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + 'KB'; // Less than 1 MB
+    else if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + 'MB'; // Less than 1 GB
+    else return (bytes / (1024 * 1024 * 1024)).toFixed(2) + 'GB'; // 1 GB or more
+};
+
+const shortenFilename = (filename) => {
+    const maxLength = 30;
+    if (filename.length > maxLength) {
+        const visiblePart = filename.slice(-maxLength);
+
+        return `...${visiblePart}`;
+    }
+    return filename;
+};
 
 const handleFileViewInteractions = (fileView) => {
     const fileViewSearchClearInp = fileView.querySelector('.clear-search-inp');
     const fileViewSearchInp = fileView.querySelector('.search-inp-container input');
     const selectAllFiles = fileView.querySelector('#select-all-files');
-    const selectFileCheckboxes = fileView.querySelectorAll('.file-list-item .select input');
+    const fileViewList = fileView.querySelector('.file-view-list');
+    const fileViewManager = fileView.querySelector('.file-manager-view');
+
+    fetch(serverUrl+'api/v1/get-user-files', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({uid: UID})
+    }).then(res => res.json()).then((data) => {
+        if(data){
+            fileViewList.innerHTML = ''
+            data.forEach((file) => {
+                const fileViewRowElm = document.createElement('div');
+                fileViewRowElm.className = 'file-list-item';
+
+                fileViewRowElm.innerHTML = `
+                    <div class="select">
+                        <input type="checkbox" name="select">
+                    </div>
+                    <div class="names" data-filename=${file.filename}>
+                        <span>${shortenFilename(file.filename)}</span>
+                    </div>
+                    <div class="sizes">
+                        <span>${formatBytes(file.size)}</span>
+                    </div>
+                    <div class="modified-on">
+                        <span>${file.lastModified}</span>
+                    </div>
+                    <div class="file-options" data-download="${serverUrl+'uploads/'+UID+'/'+file.filename}">
+                        <div class="file-view-icon">
+                            <img src="../assets/file-view-icon.svg" alt="icon">
+                        </div>
+                        <span class="download-icon">
+                            <img src="../assets/download-icon.svg" alt="">
+                        </span>
+                    </div>
+                `;
+
+                fileViewList.append(fileViewRowElm);
+            });
+            handleFileView(fileViewList);
+        }else{
+            fileViewManager.innerHTML = '<p class="no-files-uploaded">No files uploaded</p>'
+        }
+    }).catch((err) => {
+        console.log(err);
+        throw err;
+    });
 
     fileViewSearchInp.addEventListener('keyup', () => {
         console.log(fileViewSearchInp.value);
     });
 
     selectAllFiles.addEventListener('click', () => {
+        const selectFileCheckboxes = fileView.querySelectorAll('.file-list-item .select input');
         selectFileCheckboxes.forEach((inp) => {
             inp.checked = selectAllFiles.checked;
         });
@@ -208,30 +319,7 @@ const handleFileViewInteractions = (fileView) => {
     });
 }
 
-const handleWelcomBox = (welcomeBox) => {
-    const wlcmBoxInner = welcomeBox.querySelector('.box-inner');
-    const reduceBtn = welcomeBox.querySelector('.reduce');
-    const boxBoundingRect = wlcmBoxInner.getBoundingClientRect();
 
-    wlcmBoxInner.style.height = boxBoundingRect.height + 'px';
-    reduceBtn.addEventListener('click', () => {
-        if (reduceBtn.classList.contains('show-more')) {
-            wlcmBoxInner.style.height = boxBoundingRect.height + 'px';
-            reduceBtn.innerHTML = 'Reduce';
-            reduceBtn.classList.remove('show-more');
-        } else {
-            wlcmBoxInner.style.height = (boxBoundingRect.height - 105) + 'px';
-            reduceBtn.innerHTML = 'Show more';
-            reduceBtn.classList.add('show-more');
-        }
-    })
-}
-
-const handleLoginWithPatreonBtn = (btn) => {
-    btn.addEventListener('click', () => {
-        console.log('login with patreon btn clicked');
-    })
-}
 
 const handleSignInWithPass = (btn, removeElm) => {
     const inputs = btn.parentElement.querySelectorAll('input');
@@ -254,8 +342,6 @@ const handleSignInWithPass = (btn, removeElm) => {
                     email: emailInp,
                     pass: passInp
                 }
-
-                console.log('send data to server');
                 fetch(serverUrl + 'api/v1/sign-in', {
                     method: 'post',
                     body: JSON.stringify(data)
@@ -280,50 +366,161 @@ const handleSignInWithPass = (btn, removeElm) => {
     })
 }
 
-const handleSendMagicLinkBtn = (btn) => {
-    const emailInp = btn.parentElement.querySelector('input.sign-in-email-inp');
+const generateMediaTag = (url) => {
+    const extension = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
 
-    btn.addEventListener('click', () => {
-        if (emailInp.value === '') {
-            emailInp.style.borderColor = 'rgb(207, 8, 8)';
-        } else {
-            const data = {
-                email: emailInp.value,
-                data: false
+    if (['mp4', 'webm', 'ogg', 'mov'].includes(extension)) {
+        // If it's a video file, return a <video> tag
+        return `<video controls data-download="${url}">
+                    <source src="${url}" type="video/${extension}">
+                    Your browser does not support the video tag.
+                </video>`;
+    } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'heic'].includes(extension)) {
+        // If it's an image file, return an <img> tag
+        return `<img src="${url}" alt="Media" data-download="${url}" />`;
+    } else {
+        return `<p>Unsupported file type</p>`;
+    }
+};
+
+const handleFileView = (itemsContainer) => {
+    const allFileViewBtns = itemsContainer.querySelectorAll('.file-options .file-view-icon');
+    const allFileDownloadBtns = itemsContainer.querySelectorAll('.file-options .download-icon');
+    let mediaSlideItems = '';
+
+    allFileViewBtns.forEach((btn, i) => {
+        const listItem = btn.closest('.file-list-item');
+        const fileName = listItem.querySelector('.names').dataset.filename;
+        const fileURL = serverUrl+'uploads/'+UID+'/'+fileName;
+        const mediaTag = generateMediaTag(fileURL);
+        mediaSlideItems += `<div class="media-item-container" data-index=${i}>
+                                ${mediaTag}
+                            </div>`;
+
+        btn.addEventListener('click', () => {
+            const checkForFileViewer = document.querySelector('.file-viewer-elm-outer');
+            const fileViewerElm = document.createElement('div');
+            const fileViewerMainContent = `<div class="media-items-slider">
+                                                ${mediaSlideItems}
+                                            </div>
+                                            <span class="arrow-left arrow">
+                                                <img src="../../assets/arrow-black.svg" alt="arrow">
+                                            </span>
+                                            <span class="arrow-right arrow">
+                                                <img src="../../assets/arrow-black.svg" alt="arrow">
+                                            </span>`;
+            
+            fileViewerElm.className = 'file-viewer-elm-outer hide';
+            fileViewerElm.innerHTML = `<div class="file-viewer-elm">
+                                            <div class="file-viewer-header">
+                                                <span class="current-file">${i+1}/${allFileViewBtns.length}</span>
+                                                <div class="viewer-options">
+                                                    <span class="file-download" title="Download">
+                                                        <img src="../../assets/download-icon.svg" alt="icon"/>
+                                                    </span>
+                                                    <span class="file-viewer-close" title="Close">
+                                                        <img src="../../assets/cross-icon.svg" alt="icon" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="file-viewer-main">
+                                                ${fileViewerMainContent}
+                                            </div>
+                                        </div>`;
+            if(!checkForFileViewer){
+                document.body.append(fileViewerElm);
+                const activeElm = fileViewerElm.querySelector(`[data-index='${i}']`);
+                activeElm.classList.add('active');
+                fileViewerOptionsInteractions(fileViewerElm);
+            }else{
+                const oldActive = checkForFileViewer.querySelector('.active');
+                const makeActive = checkForFileViewer.querySelector(`[data-index='${i}']`);
+                const mediaSlider = checkForFileViewer.querySelector('.media-items-slider');
+                makeActive.classList.add('active');
+
+                mediaSlider.style.transform = `translateX(-${i}00%)`;
+                if(oldActive) oldActive.classList.remove('active');
+                checkForFileViewer.classList.remove('hide');
             }
-            fetch(serverUrl + 'api/v1/sign-in', ({
-                method: 'post',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })).then(res => res.json()).then((data) => {
-                console.log(data);
-            }).catch(err => {
-                console.log(err);
-            });
-            emailInp.style = ''
-        }
+        });
+    });
+
+    allFileDownloadBtns.forEach((btn) => btn.addEventListener('click', () => {
+        const downloadLink = btn.parentElement.dataset.download;
+        fileDownloader(downloadLink)
+    }));
+}
+
+const fileDownloader = (url) => {
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = '';
+    document.body.append(a);
+    a.click();
+}
+
+const getActiveElmIndex = (viewer) => {
+    const activeSlider = viewer.querySelector('.active');
+    const sliderIndex = activeSlider.dataset.index;
+    return parseInt(sliderIndex);
+}
+
+const changeActiveElmWithIndex = (viewer, index) => {
+    const activeSlider = viewer.querySelector('.active');
+
+    if(index >= 0){
+        activeSlider.classList.remove('active');
+        const newActiveSlider = viewer.querySelector(`[data-index='${index}']`);
+        newActiveSlider.classList.add('active');
+    }
+}
+
+const fileViewerOptionsInteractions = (viewer) => {
+    const mediaSlider = viewer.querySelector('.media-items-slider');
+    const sliderIndex = getActiveElmIndex(viewer);
+    const rightArrow = viewer.querySelector('.arrow-right');
+    const leftArrow = viewer.querySelector('.arrow-left');
+
+    const showCurrentSlideNum = viewer.querySelector('.current-file')
+    const downloadBtn = viewer.querySelector('.file-download');
+    const closeViewerBtn = viewer.querySelector('.file-viewer-close');
+
+    mediaSlider.style.transform = `translateX(-${sliderIndex}00%)`;
+    setTimeout(() => {
+        viewer.classList.remove('hide');
+    }, 10);
+
+    downloadBtn.addEventListener('click', () => {
+        const activeElm = document.querySelector('.media-items-slider').querySelector('.active');
+        console.log(activeElm.children[0].dataset.download);
+    })
+
+    closeViewerBtn.addEventListener('click', () => {
+        const activeElm = document.querySelector('.media-items-slider').querySelector('.active');
+        if(activeElm) activeElm.classList.remove('active');
+        viewer.classList.add('hide');
+    });
+
+    // media viewer slider
+    rightArrow.addEventListener('click', () => {
+        const index = getActiveElmIndex(viewer);
+        const mediaSliderChildCount = mediaSlider.childElementCount;
+        if(index+1 < mediaSliderChildCount) changeActiveElmWithIndex(viewer, index+1);
+        showCurrentSlideNum.innerHTML = (index+2 <= mediaSliderChildCount ? index+2 : index+1) + '/' + mediaSliderChildCount
+        mediaSlider.style.transform = `translateX(-${index+1 < mediaSliderChildCount ? index + 1 : index}00%)`;
+    });
+    leftArrow.addEventListener('click', () => {
+        const index = getActiveElmIndex(viewer);
+        const mediaSliderChildCount = mediaSlider.childElementCount;
+
+        changeActiveElmWithIndex(viewer, index-1)
+        showCurrentSlideNum.innerHTML = (index-1 < 0 ? 1 : index) + '/' + mediaSliderChildCount
+        mediaSlider.style.transform = `translateX(-${index-1 < 0 ? 0 : index-1}00%)`;
     });
 }
 
-const handleFaqList = (faqElmList) => {
-    faqElmList.forEach((faq) => {
-        const faqBoxContent = faq.querySelector('p');
-        const faqBoxBoudingRect = faq.getBoundingClientRect();
-        const faqContentBoudingRect = faqBoxContent.getBoundingClientRect();
 
-        faq.addEventListener('click', () => {
-            const expandHeight = faqContentBoudingRect.height + faqBoxBoudingRect.height + 20;
-            faq.classList.toggle('expanded');
-            if (faq.classList.contains('expanded')) {
-                faq.style.height = faqBoxBoudingRect.height + 'px';
-            } else {
-                faq.style.height = expandHeight + 1 + 'px';
-            }
-        });
-    })
-}
 
 uploadBtnLeftMenu.addEventListener('click', () => leftMenu.querySelector(`[data-page='upload-files']`).click());
 
@@ -349,6 +546,8 @@ window.addEventListener('load', () => {
         captureAuthCode();
         // getAccessToken();
     }
+
+    setupUser();
 });
 
 
