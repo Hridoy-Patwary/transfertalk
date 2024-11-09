@@ -63,7 +63,9 @@ const setupUser = () => {
             },
             body: JSON.stringify({id: checkUUID})
         }).then(res => res.json()).then((data) => {
-            storeInLocal('user-data', data);
+            if(data.username){
+                storeInLocal('user-data', data);
+            }
         }).catch((err) => {
             console.log(err);
             throw err;
@@ -90,20 +92,32 @@ const setupUser = () => {
 
 const updateUiWithUserData = () => {
     const data = getFromLocal('user-data');
+    const profileHeading = document.querySelector('.profile-heading');
     const hideElm = document.querySelectorAll('.hide-after-signin');
     const anonymousBtn = leftMenu.querySelector('.menu-bar-top-buttons .username-elm');
     const loginWithPatreonBtn = document.querySelector('.login.login-with-patreon');
+
 
     if(data && data.username){
         signInBtnHeader.classList.add('goto-profile');
         signInBtnHeader.innerHTML = data.username;
         anonymousBtn.innerHTML = data.username;
 
+        if(profileHeading) {
+            const logOutBtn = profileHeading.querySelector('.log-out-btn');
+
+            logOutBtn.classList.remove('hide');
+            logOutBtn.addEventListener('click', () => {
+                localStorage.clear();
+                document.cookie = `userId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                window.location.href = '/'
+            })
+        };
         if(loginWithPatreonBtn) loginWithPatreonBtn.innerHTML = 'Connect with Patreon';
 
         hideElm.forEach((elm) => {
             elm.remove();
-        })
+        });
     }
 }
 
@@ -346,10 +360,7 @@ const createAcccountHandler = (UI) => {
                     body: JSON.stringify(userData)
                 }).then(res => res.json()).then((data) => {
                     if(data.username){
-                        const homeMenuItem = document.querySelector(`[data-page='home']`);
-
-
-                        homeMenuItem.click();
+                        gotoHome();
                         singUpBtn.disabled = false;
                         storeInLocal('user-data', data);
                         updateUiWithUserData();
@@ -365,6 +376,11 @@ const createAcccountHandler = (UI) => {
             }
         }
     });
+}
+
+const gotoHome = () => {
+    const homeMenuItem = document.querySelector(`[data-page='home']`);
+    homeMenuItem.click();
 }
 
 const handleFileViewInteractions = (fileView) => {
@@ -453,18 +469,34 @@ const handleSignInWithPass = (btn, removeElm) => {
                     checkEmptyInp = true;
                     inp.style.borderColor = 'rgb(207, 8, 8)';
                 } else inp.style = '';
+
+                if(inp.type == 'email'){
+                    if(!isValidEmail(inp.value)){
+                        checkEmptyInp = true;
+                        inp.style.borderColor = 'rgb(207, 8, 8)';
+                    }else inp.style = '';
+                }
             });
 
             if (checkEmptyInp === false) {
                 const data = {
-                    email: emailInp,
-                    pass: passInp
+                    email: emailInp.value,
+                    pass: passInp.value
                 }
                 fetch(serverUrl + 'api/v1/sign-in', {
                     method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(data)
                 }).then(res => res.json()).then((data) => {
-                    console.log(data);
+                    if(data.message){
+                        // show message
+                    }else{
+                        storeInLocal('user-data', data);
+                        gotoHome();
+                        updateUiWithUserData();
+                    }
                 }).catch((err) => {
                     console.log(err);
                 })

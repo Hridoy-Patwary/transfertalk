@@ -5,9 +5,32 @@ const db = require('../db/connect');
 
 const saltRounds = 10;
 
-router.post('/v1/sign-in', (req, res) => {
-    console.log(req.body)
-    res.status(200).json('successfull');
+router.post('/v1/sign-in', async (req, res) => {
+    await db.connect();
+    const data = req.body;
+    const conn = db.getConnection();
+
+    try {
+        const selectSql = `SELECT * FROM users WHERE email = '${data.email}'`;
+        const [result] = await conn.query(selectSql);
+        const rowData = result[0];
+
+        const match = await bcrypt.compare(data.pass, rowData.password);
+
+        delete rowData.password;
+        if(match){
+            res.status(200).json(rowData);
+        }else{
+            res.status(200).json({message: "password didn't match!"});
+        }
+
+        await conn.end();
+    } catch (err) {
+        console.log(err);
+        await conn.end();
+        res.status(500).json({error: 'failed to sign in'});
+        throw err;
+    }
 });
 
 router.post('/v1/sign-up', async (req, res) => {

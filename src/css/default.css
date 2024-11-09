@@ -328,7 +328,7 @@ header .header-right .change-theme:hover {
 
 .left-menu-bar .handle-left-menu {
     position: absolute;
-    bottom: 50px;
+    bottom: 20px;
     left: 20px;
     height: 40px;
     padding: 0 16px;
@@ -1209,6 +1209,31 @@ circle {
     display: flex;
     gap: 5px;
     padding: 20px;
+    position: relative;
+}
+
+.profile-heading .log-out-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    height: 30px;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid rgb(220, 45, 45);
+    cursor: pointer;
+    transition: .2s ease-in-out;
+}
+
+.profile-heading .log-out-btn.hide{
+    display: none;
+}
+
+.profile-heading .log-out-btn:hover{
+    background: rgb(220, 45, 45);
 }
 
 .profile-heading .user-icon{
@@ -1370,6 +1395,58 @@ circle {
     filter: var(--imgInvertColor);
 }
 
+/* ---------------- contact us page ---------------- */
+.contact-page-outer{
+    display: flex;
+    justify-content: center;
+}
+
+.contact-page{
+    width: 100%;
+    max-width: 600px;
+}
+
+.contact-ui{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.contact-ui input{
+    background: none;
+    font-size: 16px;
+    border: 1px solid var(--innerBoxBg);
+    height: 40px;
+    padding-left: 10px;
+    border-radius: inherit;
+    color: var(--mainTextColor);
+}
+
+.contact-ui textarea{
+    height: 100px;
+    padding: 10px;
+    font-size: 16px;
+    background: none;
+    border: 1px solid var(--innerBoxBg);
+    border-radius: inherit;
+    resize: vertical;
+    outline: none;
+    color: var(--mainTextColor);
+}
+
+.contact-ui .send-contact-request{
+    height: 40px;
+    background: var(--primaryColor);
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: inherit;
+    letter-spacing: .5px;
+    margin-top: 10px;
+}
 /* ---------------- popup alert ---------------- */
 
 .popup-alert-outer{
