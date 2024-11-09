@@ -88,6 +88,25 @@ const setupUser = () => {
     }
 }
 
+const updateUiWithUserData = () => {
+    const data = getFromLocal('user-data');
+    const hideElm = document.querySelectorAll('.hide-after-signin');
+    const anonymousBtn = leftMenu.querySelector('.menu-bar-top-buttons .username-elm');
+    const loginWithPatreonBtn = document.querySelector('.login.login-with-patreon');
+
+    if(data && data.username){
+        signInBtnHeader.classList.add('goto-profile');
+        signInBtnHeader.innerHTML = data.username;
+        anonymousBtn.innerHTML = data.username;
+
+        if(loginWithPatreonBtn) loginWithPatreonBtn.innerHTML = 'Connect with Patreon';
+
+        hideElm.forEach((elm) => {
+            elm.remove();
+        })
+    }
+}
+
 changeTheme.addEventListener('click', () => {
     const currentIcon = themeIcon.dataset.currenticon;
 
@@ -137,7 +156,13 @@ handleLeftMenu.addEventListener('click', () => {
 signInBtnHeader.addEventListener('click', (e) => {
     e.preventDefault();
     const signInMenuItem = leftMenu.querySelector(`[data-page="sign-in"]`);
-    signInMenuItem.click();
+    const profilePage = leftMenu.querySelector('[data-page="profile"]');
+
+    if(signInBtnHeader.classList.contains('goto-profile')){
+        profilePage.click();
+    }else{
+        signInMenuItem.click();
+    }
 });
 
 const storeInLocal = (key, data) => {
@@ -201,18 +226,19 @@ const checkAndUpdateChangedUIeventListeners = () => {
     const fileDragArea = document.querySelector('.drag-and-drop-area');
     const fileUploadInp = document.getElementById('file-upload-inp');
     const createAccSignInPage = document.querySelector('.create-account-sign-in-pg');
+    const createAccPage = document.querySelector('.create-account-ui-outer');
+    const subscribeViaPatreon = document.querySelector('.subscribe-via-patreon');
     const signInWithPass = document.querySelector('.login-with-pass');
     const signInSendMeMagicLink = document.querySelector('.send-magic-link');
     const loginWithPatreon = document.querySelector('.login-with-patreon');
     const faqList = document.querySelectorAll('.faq-page .faq-list .faq-box');
     const welcomeBox = document.querySelector('.welcome-box');
 
-    
-
     const profileUI = document.querySelector('.profile-ui');
     const fileViewMain = document.querySelector('.file-view-ui');
 
 
+    updateUiWithUserData();
     if (fileDragArea) handleDragAndDrop(fileDragArea, fileUploadInp);
 
     if (signInWithPass) handleSignInWithPass(signInWithPass, signInSendMeMagicLink);
@@ -223,31 +249,123 @@ const checkAndUpdateChangedUIeventListeners = () => {
     if (createAccSignInPage) {
         createAccSignInPage.addEventListener('click', () => {
             leftMenu.querySelector(`[data-page='create-account']`).click();
-        })
+        });
     }
+    if(subscribeViaPatreon) subscribeViaPatreon.addEventListener('click', subscribeViaPatreonHandler);
 
     if (faqList) handleFaqList(faqList);
 
     if(profileUI) profileUiInteractions(profileUI);
     if(fileViewMain) handleFileViewInteractions(fileViewMain);
+
+    createAcccountHandler(createAccPage);
 }
 
-const formatBytes = (bytes) => {
-    if (bytes < 1024) return `${bytes} B`; // Less than 1 KB
-    else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + 'KB'; // Less than 1 MB
-    else if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + 'MB'; // Less than 1 GB
-    else return (bytes / (1024 * 1024 * 1024)).toFixed(2) + 'GB'; // 1 GB or more
-};
-
-const shortenFilename = (filename) => {
-    const maxLength = 30;
-    if (filename.length > maxLength) {
-        const visiblePart = filename.slice(-maxLength);
-
-        return `...${visiblePart}`;
+const subscribeViaPatreonHandler = () => {
+    const checkForPopupElm = document.querySelector('.popup-alert-outer');
+    let showPopupAlert = document.createElement('div');
+    
+    showPopupAlert.className = 'popup-alert-outer';
+    showPopupAlert.innerHTML = `<div class="popup-alert-inner">
+                                    <div class="content">
+                                    <h3>Login with Patreon first</h3>
+                                        <p>In order to subscribe via Patreon you need to login with Patreon first</p>
+                                    </div>
+                                    <div class="popup-buttons">
+                                        <button class="continue-login">Login with Patreon</button>
+                                        <Button class="popup-cancel">Cancel</button>
+                                    </div>
+                                </div>`;
+    
+    if(checkForPopupElm){
+        showPopupAlert = checkForPopupElm;
+        showPopupAlert.classList.remove('hide');
+    }else{
+        document.body.append(showPopupAlert);
     }
-    return filename;
+    showPopupAlert.querySelector('.continue-login').addEventListener('click', () => {
+        console.log('continue login')
+    })
+    showPopupAlert.querySelector('.popup-cancel').addEventListener('click', () => {
+        showPopupAlert.classList.add('hide');
+    });
+}
+
+const isValidEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
 };
+
+const createAcccountHandler = (UI) => {
+    if(!UI) return;
+
+    const singUpBtn = UI.querySelector('.sign-in-submit');
+    const inputs = UI.querySelectorAll('.create-account-inp-box input');
+    const confirmPassInp = UI.querySelector('.create-account-inp-box input.conf-pass');
+
+    if(singUpBtn) singUpBtn.addEventListener('click', () => {
+        singUpBtn.disabled = true;
+
+        let everyThingValid = true,
+            inpDataObj = {};
+        
+        inputs.forEach((inp) => {
+            if(inp.value == ''){
+                everyThingValid = false;
+                inp.style.borderColor = 'rgb(199, 78, 78)';
+            }else{
+                if(inp.name == 'email'){
+                    if(!isValidEmail(inp.value)){
+                        everyThingValid = false;
+                        inp.style.borderColor = 'rgb(199, 78, 78)';
+                    }else{
+                        inp.style = ''
+                    }
+                }else{
+                    inp.style = ''
+                }
+            }
+            inpDataObj[inp.name] = inp.value;
+        });
+
+        if(everyThingValid) {
+            if(inpDataObj.password === inpDataObj['cf-pass']){
+                confirmPassInp.style = '';
+                const userData = {
+                    username: inpDataObj['name'],
+                    email: inpDataObj['email'],
+                    password: inpDataObj['password'],
+                    uid: UID
+                }
+
+                fetch(serverUrl+'api/v1/sign-up', {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                }).then(res => res.json()).then((data) => {
+                    if(data.username){
+                        const homeMenuItem = document.querySelector(`[data-page='home']`);
+
+
+                        homeMenuItem.click();
+                        singUpBtn.disabled = false;
+                        storeInLocal('user-data', data);
+                        updateUiWithUserData();
+                    }else{
+                        window.location.reload();
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                    throw err;
+                })
+            }else{
+                confirmPassInp.style.borderColor = 'rgb(199, 78, 78)';
+            }
+        }
+    });
+}
 
 const handleFileViewInteractions = (fileView) => {
     const fileViewSearchClearInp = fileView.querySelector('.clear-search-inp');
@@ -546,7 +664,7 @@ window.addEventListener('load', () => {
         captureAuthCode();
         // getAccessToken();
     }
-
+    updateUiWithUserData();
     setupUser();
 });
 

@@ -205,9 +205,7 @@ const profileUiInteractions = (UI) => {
         profileViewUserName.innerHTML = 'anonym' + UID;
     }
 
-    upgradeWithPatreon.addEventListener('click', () => {
-        alert("You'll need to Login with Patreon first to subscribe with Patreon")
-    });
+    upgradeWithPatreon.addEventListener('click', subscribeViaPatreonHandler);
 }
 
 
@@ -247,6 +245,23 @@ const handleFaqList = (faqElmList) => {
         });
     })
 }
+
+const formatBytes = (bytes) => {
+    if (bytes < 1024) return `${bytes} B`; // Less than 1 KB
+    else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + 'KB'; // Less than 1 MB
+    else if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + 'MB'; // Less than 1 GB
+    else return (bytes / (1024 * 1024 * 1024)).toFixed(2) + 'GB'; // 1 GB or more
+};
+
+const shortenFilename = (filename) => {
+    const maxLength = 30;
+    if (filename.length > maxLength) {
+        const visiblePart = filename.slice(-maxLength);
+
+        return `...${visiblePart}`;
+    }
+    return filename;
+};
 
 const handleSendMagicLinkBtn = (btn) => {
     const emailInp = btn.parentElement.querySelector('input.sign-in-email-inp');

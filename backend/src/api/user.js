@@ -9,9 +9,10 @@ const db = require('../db/connect');
 const createUserTable = `CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(255),
+        email VARCHAR(255),
+        password TEXT,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        metadata TEXT
-)`;
+        metadata TEXT)`;
 
 const formatDate = (timestamp) => {
     const date = new Date(timestamp);
@@ -76,18 +77,20 @@ router.post('/v1/auto-user', async (req, res) => {
         await db.connect();
         const connection = db.getConnection();
         const username = '';
+        const email = '';
+        const password = '';
         const metadata = JSON.stringify({ modified: false });
         const insertUserQuery = `
-            INSERT INTO users (username, metadata)
-            VALUES (?, ?)
+            INSERT INTO users (username, email, password, metadata)
+            VALUES (?, ?, ?, ?)
         `;
         
         await connection.query(createUserTable);
         
-        const [result] = await connection.query(insertUserQuery, [username, metadata]);
+        const [result] = await connection.query(insertUserQuery, [username, email, password, metadata]);
         const newUserId = result.insertId;
         
-        connection.end();
+        await connection.end();
         res.json({id: newUserId});
     } catch (err) {
         console.log(err);
@@ -107,7 +110,7 @@ router.post('/v1/get-user-data', async (req, res) => {
         const result = await conn.query(getDataQuery);
         const data = result[0][0];
 
-        conn.end();
+        await conn.end();
         res.json(data);
     } catch (err) {
         console.log(err);

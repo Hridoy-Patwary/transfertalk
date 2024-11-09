@@ -1258,7 +1258,7 @@ circle {
     color: white;
 }
 
-.file-viewer-elm-outer{
+.file-viewer-elm-outer, .popup-alert-outer{
     width: 100vw;
     height: 100vh;
     position: fixed;
@@ -1368,4 +1368,63 @@ circle {
     width: 25px;
     height: 30px;
     filter: var(--imgInvertColor);
+}
+
+/* ---------------- popup alert ---------------- */
+
+.popup-alert-outer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 200ms ease-in-out;
+}
+
+.popup-alert-outer.hide{
+    opacity: 0;
+    visibility: hidden;
+}
+
+.popup-alert-outer .popup-alert-inner{
+    border-radius: 5px;
+    background: var(--boxBg);
+    text-align: center;
+}
+
+.popup-alert-outer .popup-alert-inner .content{
+    padding: 20px;
+}
+
+.popup-alert-outer .popup-alert-inner h3{
+    margin-bottom: 6px;
+    letter-spacing: .5px;
+}
+
+.popup-alert-outer .popup-alert-inner p{
+    color: var(--secondaryTextColor);
+    margin-bottom: 10px;
+}
+
+.popup-alert-outer .popup-alert-inner .popup-buttons{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border-top: 1px solid var(--innerBoxBg);
+    padding: 10px 20px;
+}
+
+.popup-alert-outer .popup-alert-inner .popup-buttons button{
+    height: 40px;
+    font-size: 16px;
+    background: var(--primaryColor);
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    color: white;
+    letter-spacing: .5px;
+    border-radius: 5px;
+}
+
+.popup-alert-outer .popup-alert-inner .popup-buttons .popup-cancel{
+    background: var(--innerBoxBg);
 }

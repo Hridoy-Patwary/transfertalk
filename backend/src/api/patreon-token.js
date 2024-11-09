@@ -41,10 +41,10 @@ router.post('/v1/token', async (req, res) => {
             try {
                 await connection.query(createTableQuery);
                 await connection.query(sql)
-                connection.end();
+                await connection.end();
             } catch (err) {
                 console.log(err)
-                connection.end();
+                await connection.end();
             }
         }
         res.json(data);
