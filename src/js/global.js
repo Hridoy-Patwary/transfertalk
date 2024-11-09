@@ -205,7 +205,6 @@ menuList.forEach((menu) => menu.addEventListener('click', () => {
     if(!menu.dataset.page) return;
     const currentUrl = new URL(window.location.href);
     const oldActiveMenu = leftMenu.querySelector('.menu-bar-main li.active');
-    // const urlStateTxt = menu.innerText.toLowerCase().replaceAll(' ', '-').trim();
     const urlStateTxt = menu.dataset.page;
     const page = urlStateTxt;
 
